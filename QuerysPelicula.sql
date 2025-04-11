@@ -70,6 +70,7 @@ ORDER BY cant_depto DESC;
 
 -- Parte 2
 
+-- Ejercicio 1
 -- 1.1 Listar todas las películas que poseen entregas de películas de idioma inglés durante
 -- el año 2006. (P)
 SELECT *
@@ -160,6 +161,7 @@ d.id_departamento = e.id_departamento AND
 EXTRACT(YEARS FROM AGE(e.fecha_nacimiento)) >= 18
 GROUP BY c.nombre_ciudad; -- FALTA QUE EL DEPTO TENGA AL MENOS 30 EMPLEADOS
 
+-- Ejercicio 3
 -- 3.1 Se solicita llenarla con la información correspondiente a los datos completos de
 -- todos los distribuidores nacionales.
 
