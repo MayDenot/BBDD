@@ -70,7 +70,6 @@ ORDER BY cant_depto DESC;
 
 -- Parte 2
 
--- Ejercicio 1
 -- 1.1 Listar todas las películas que poseen entregas de películas de idioma inglés durante
 -- el año 2006. (P)
 SELECT *
@@ -111,13 +110,14 @@ WHERE EXISTS (
 );
 
 -- 1.5 Determinar los jefes que poseen personal a cargo y cuyos departamentos (los del
--- jefe) se encuentren en la Argentina. FALTA COMPLETAR
-SELECT *
-FROM empleado e
-WHERE id_empleado IN (
-    SELECT id_departamento
-    FROM departamento d
-    WHERE jefe_departamento = e.id_empleado
+-- jefe) se encuentren en la Argentina.
+SELECT ej.*
+FROM empleado e JOIN empleado ej ON (e.id_jefe = ej.id_empleado)
+WHERE (ej.id_distribuidor, ej.id_departamento) IN (
+    SELECT id_distribuidor, id_departamento
+    FROM departamento d JOIN ciudad c USING(id_ciudad)
+    JOIN pais p USING (id_pais)
+    WHERE UPPER(p.nombre_pais) = 'ARGENTINA'
 );
 
 -- 1.6 Liste el apellido y nombre de los empleados que pertenecen a aquellos
@@ -133,7 +133,7 @@ WHERE EXISTS (
         JOIN empleado j ON j.id_empleado = d.jefe_departamento
     WHERE p.nombre_pais = 'Argentina'
       AND d.id_departamento = e.id_departamento
-      AND j.porc_comision > (e.porc_comision * 0.1)
+      AND j.porc_comision > e.porc_comision * 0.1
 );
 
 -- 1.7 Indicar la cantidad de películas entregadas a partir del 2010, por género.
@@ -156,21 +156,6 @@ ORDER BY 2;
 SELECT c.nombre_ciudad AS "Ciudad", COUNT(e.id_empleado) AS "Cantidad Empleados"
 FROM ciudad c JOIN departamento d USING (id_ciudad)
 JOIN empleado e USING (id_departamento)
-WHERE d.id_ciudad = c.id_ciudad AND
-d.id_departamento = e.id_departamento AND
-EXTRACT(YEARS FROM AGE(e.fecha_nacimiento)) >= 18
-GROUP BY c.nombre_ciudad; -- FALTA QUE EL DEPTO TENGA AL MENOS 30 EMPLEADOS
-
--- Ejercicio 3
--- 3.1 Se solicita llenarla con la información correspondiente a los datos completos de
--- todos los distribuidores nacionales.
-
--- 3.2 Agregar a la definición de la tabla distribuidor_nac, el campo "codigo_pais"; que
--- indica el código de país del distribuidor mayorista que atiende a cada distribuidor
--- nacional.(codigo_pais varchar(5) NULL)
-
--- 3.3. Para todos los registros de la tabla distribuidor_nac, llenar el nuevo campo
--- "codigo_pais" con el valor correspondiente existente en la tabla "Internacional";.
-
--- 3.4. Eliminar de la tabla distribuidor_nac los registros que no tienen asociado un
--- distribuidor mayorista.
+WHERE EXTRACT(YEARS FROM AGE(e.fecha_nacimiento)) >= 18
+GROUP BY c.nombre_ciudad
+HAVING COUNT(e.id_empleado)>= 30;
